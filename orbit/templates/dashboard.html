@@ -29,7 +29,7 @@
                 <span class="panel-icon">✦</span>
             </div>
 
-            <div id="chat-messages" class="chat-messages">
+            <div id="chat-messages" class="chat-messages" aria-live="polite">
                 <div class="chat-bubble assistant-bubble">
                     <span class="message-label">ORBIT AI</span>
                     안녕하세요! 저는 ORBIT예요. 무엇이든 편하게 물어보세요.
@@ -48,7 +48,9 @@
                     ↑
                 </button>
             </form>
-            <p class="input-hint">ORBIT AI와 함께 생각을 정리해 보세요.</p>
+            <p id="chat-error" class="input-hint" role="status">
+                AI 대화 기능은 다음 단계에서 연결할 예정이에요.
+            </p>
         </section>
 
         <section class="panel notes-panel">
@@ -72,7 +74,21 @@
             </form>
 
             <div id="notes-list" class="notes-list">
-                <p class="empty-state">아직 메모가 없어요. 첫 메모를 추가해 보세요!</p>
+                {% for note in notes %}
+                <div class="note-item" data-note-id="{{ note.id }}">
+                    <span class="note-content">{{ note.content }}</span>
+                    <button
+                        type="button"
+                        class="delete-note-button"
+                        data-delete-note="{{ note.id }}"
+                        aria-label="메모 삭제"
+                    >×</button>
+                </div>
+                {% else %}
+                <p class="empty-state" id="empty-notes">
+                    아직 메모가 없어요. 첫 메모를 추가해 보세요!
+                </p>
+                {% endfor %}
             </div>
         </section>
     </div>
@@ -107,4 +123,3 @@
     </section>
 </section>
 {% endblock %}
-
