@@ -1,1 +1,49 @@
 
+{% extends "base.html" %}
+
+{% block title %}로그인 | ORBIT AI{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-icon">◉</div>
+        <p class="eyebrow">WELCOME BACK</p>
+        <h1>다시 만나서 반가워요.</h1>
+        <p class="auth-description">
+            ORBIT AI에 로그인하고 나만의 공간을 시작하세요.
+        </p>
+
+        <form method="POST" class="auth-form">
+            <label for="email">이메일</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="이메일을 입력하세요"
+                autocomplete="email"
+                required
+            >
+
+            <label for="password">비밀번호</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="비밀번호를 입력하세요"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit" class="primary-button">
+                로그인하기 <span>→</span>
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            아직 계정이 없나요?
+            <a href="{{ url_for('main.register') }}">회원가입</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
+
