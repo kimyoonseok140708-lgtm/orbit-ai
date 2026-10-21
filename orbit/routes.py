@@ -1,10 +1,10 @@
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from orbit import db
-from orbit.models import User
+from orbit.models import User, Note
 
 main = Blueprint("main", __name__)
 
@@ -43,7 +43,6 @@ def register():
             )
             db.session.add(user)
             db.session.commit()
-
             login_user(user)
             flash("회원가입이 완료되었습니다!", "success")
             return redirect(url_for("main.dashboard"))
@@ -59,7 +58,6 @@ def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password_hash, password):
@@ -83,5 +81,47 @@ def logout():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    notes = Note.query.filter_by(user_id=current_user.id).order_by(
+        Note.created_at.desc()
+    ).all()
+    return render_template("dashboard.html", notes=notes)
 
+
+@main.route("/api/notes", methods=["POST"])
+@login_required
+def add_note():
+    data = request.get_json(silent=True) or {}
+    content = data.get("content", "").strip()
+
+    if not content:
+        return jsonify({"error": "메모 내용을 입력해 주세요."}), 400
+
+    if len(content) > 300:
+        return jsonify({"error": "메모는 300자 이하로 입력해 주세요."}), 400
+
+    note = Note(content=content, user_id=current_user.id)
+    db.session.add(note)
+    db.session.commit()
+
+    return jsonify({
+        "id": note.id,
+        "content": note.content,
+        "message": "메모를 저장했어요."
+    }), 201
+
+
+@main.route("/api/notes/<int:note_id>/delete", methods=["POST"])
+@login_required
+def delete_note(note_id):
+    note = Note.query.filter_by(
+        id=note_id,
+        user_id=current_user.id
+    ).first()
+
+    if note is None:
+        return jsonify({"error": "메모를 찾을 수 없습니다."}), 404
+
+    db.session.delete(note)
+    db.session.commit()
+
+    return jsonify({"message": "메모를 삭제했어요."})
