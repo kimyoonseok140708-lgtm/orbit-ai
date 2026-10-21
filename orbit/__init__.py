@@ -28,11 +28,12 @@ def create_app():
     login_manager.login_view = "main.login"
     login_manager.login_message = "로그인이 필요합니다."
 
+    from orbit import models
     from orbit.routes import main
+
     app.register_blueprint(main)
 
     with app.app_context():
         db.create_all()
 
     return app
-
