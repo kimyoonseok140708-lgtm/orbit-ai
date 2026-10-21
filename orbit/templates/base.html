@@ -1,1 +1,52 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ORBIT AI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <div class="background-glow"></div>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.index') }}" class="logo">
+            <span class="logo-icon">◉</span>
+            <span>ORBIT<span class="logo-ai"> AI</span></span>
+        </a>
+
+        <nav class="navigation">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}">대시보드</a>
+                <a href="{{ url_for('main.logout') }}">로그아웃</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">로그인</a>
+                <a href="{{ url_for('main.register') }}" class="nav-button">시작하기</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>ORBIT AI · Your personal AI assistant</p>
+    </footer>
+</body>
+</html>
+
